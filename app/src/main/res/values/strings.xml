@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">SkizaCast</string>
+    <string name="top_podcasts">Top Podcasts</string>
+    <string name="popular_social_culture">Popular in Social and Culture</string>
+    <string name="popular_art">Popular in Art</string>
+    <string name="popular_design">Popular in Design</string>
+    <string name="popular_business">Popular in Business</string>
+    <string name="popular_tech">Popular in Technology</string>
+</resources>
