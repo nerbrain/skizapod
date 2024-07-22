@@ -221,6 +221,7 @@ object DummyData {
             image = "https://image.simplecastcdn.com/images/00c81e60-45f9-4643-9fed-2184b2b6a3d3/5fbdc9d4-22ab-4b3a-a2bd-72777b15c30c/3000x3000/stitcher-cover-99percentinvisible-3000x3000-r2021-final.jpg",
             title = "Episode 1",
             description = "An introduction to our podcast series.",
+            uri = "https://dts.podtrac.com/redirect.mp3/chrt.fm/track/288D49/stitcher.simplecastaudio.com/3bb687b0-04af-4257-90f1-39eef4e631b6/episodes/9a1ec5cb-405a-4ebb-8569-fced57c3d129/audio/128/default.mp3?aid=rss_feed&awCollectionId=3bb687b0-04af-4257-90f1-39eef4e631b6&awEpisodeId=9a1ec5cb-405a-4ebb-8569-fced57c3d129&feed=BqbsxVfO",
             duration = "20"
         ),
         Episode(
@@ -228,6 +229,7 @@ object DummyData {
             image = "https://image.simplecastcdn.com/images/00c81e60-45f9-4643-9fed-2184b2b6a3d3/5fbdc9d4-22ab-4b3a-a2bd-72777b15c30c/3000x3000/stitcher-cover-99percentinvisible-3000x3000-r2021-final.jpg",
             title = "Episode 2",
             description = "Discussing the latest trends in technology.",
+            uri = "https://dts.podtrac.com/redirect.mp3/chrt.fm/track/288D49/stitcher.simplecastaudio.com/3bb687b0-04af-4257-90f1-39eef4e631b6/episodes/9a1ec5cb-405a-4ebb-8569-fced57c3d129/audio/128/default.mp3?aid=rss_feed&awCollectionId=3bb687b0-04af-4257-90f1-39eef4e631b6&awEpisodeId=9a1ec5cb-405a-4ebb-8569-fced57c3d129&feed=BqbsxVfO",
             duration = "35"
         ),
         Episode(
@@ -235,6 +237,7 @@ object DummyData {
             title = "Episode 3",
             image = "https://image.simplecastcdn.com/images/00c81e60-45f9-4643-9fed-2184b2b6a3d3/5fbdc9d4-22ab-4b3a-a2bd-72777b15c30c/3000x3000/stitcher-cover-99percentinvisible-3000x3000-r2021-final.jpg",
             description = "Interview with a renowned tech entrepreneur.",
+            uri = "https://dts.podtrac.com/redirect.mp3/chrt.fm/track/288D49/stitcher.simplecastaudio.com/3bb687b0-04af-4257-90f1-39eef4e631b6/episodes/9a1ec5cb-405a-4ebb-8569-fced57c3d129/audio/128/default.mp3?aid=rss_feed&awCollectionId=3bb687b0-04af-4257-90f1-39eef4e631b6&awEpisodeId=9a1ec5cb-405a-4ebb-8569-fced57c3d129&feed=BqbsxVfO",
             duration = "40"
         ),
         Episode(
@@ -242,6 +245,7 @@ object DummyData {
             title = "Episode 4",
             image = "https://image.simplecastcdn.com/images/00c81e60-45f9-4643-9fed-2184b2b6a3d3/5fbdc9d4-22ab-4b3a-a2bd-72777b15c30c/3000x3000/stitcher-cover-99percentinvisible-3000x3000-r2021-final.jpg",
             description = "Deep dive into software development best practices.",
+            uri = "https://dts.podtrac.com/redirect.mp3/chrt.fm/track/288D49/stitcher.simplecastaudio.com/3bb687b0-04af-4257-90f1-39eef4e631b6/episodes/9a1ec5cb-405a-4ebb-8569-fced57c3d129/audio/128/default.mp3?aid=rss_feed&awCollectionId=3bb687b0-04af-4257-90f1-39eef4e631b6&awEpisodeId=9a1ec5cb-405a-4ebb-8569-fced57c3d129&feed=BqbsxVfO",
             duration = "50"
         ),
         Episode(
@@ -249,6 +253,7 @@ object DummyData {
             title = "Episode 5",
             image = "https://image.simplecastcdn.com/images/00c81e60-45f9-4643-9fed-2184b2b6a3d3/5fbdc9d4-22ab-4b3a-a2bd-72777b15c30c/3000x3000/stitcher-cover-99percentinvisible-3000x3000-r2021-final.jpg",
             description = "Exploring the future of artificial intelligence.",
+            uri = "https://dts.podtrac.com/redirect.mp3/chrt.fm/track/288D49/stitcher.simplecastaudio.com/3bb687b0-04af-4257-90f1-39eef4e631b6/episodes/9a1ec5cb-405a-4ebb-8569-fced57c3d129/audio/128/default.mp3?aid=rss_feed&awCollectionId=3bb687b0-04af-4257-90f1-39eef4e631b6&awEpisodeId=9a1ec5cb-405a-4ebb-8569-fced57c3d129&feed=BqbsxVfO",
             duration = "45"
         ),
         Episode(
@@ -256,6 +261,7 @@ object DummyData {
             title = "Episode 6",
             image = "https://image.simplecastcdn.com/images/00c81e60-45f9-4643-9fed-2184b2b6a3d3/5fbdc9d4-22ab-4b3a-a2bd-72777b15c30c/3000x3000/stitcher-cover-99percentinvisible-3000x3000-r2021-final.jpg",
             description = "Tips and tricks for optimizing your workflow.",
+            uri = "https://dts.podtrac.com/redirect.mp3/chrt.fm/track/288D49/stitcher.simplecastaudio.com/3bb687b0-04af-4257-90f1-39eef4e631b6/episodes/9a1ec5cb-405a-4ebb-8569-fced57c3d129/audio/128/default.mp3?aid=rss_feed&awCollectionId=3bb687b0-04af-4257-90f1-39eef4e631b6&awEpisodeId=9a1ec5cb-405a-4ebb-8569-fced57c3d129&feed=BqbsxVfO",
             duration = "30"
         ),
         Episode(
@@ -263,6 +269,7 @@ object DummyData {
             title = "Episode 7",
             image = "https://image.simplecastcdn.com/images/00c81e60-45f9-4643-9fed-2184b2b6a3d3/5fbdc9d4-22ab-4b3a-a2bd-72777b15c30c/3000x3000/stitcher-cover-99percentinvisible-3000x3000-r2021-final.jpg",
             description = "The importance of cybersecurity in the digital age.",
+            uri = "https://dts.podtrac.com/redirect.mp3/chrt.fm/track/288D49/stitcher.simplecastaudio.com/3bb687b0-04af-4257-90f1-39eef4e631b6/episodes/9a1ec5cb-405a-4ebb-8569-fced57c3d129/audio/128/default.mp3?aid=rss_feed&awCollectionId=3bb687b0-04af-4257-90f1-39eef4e631b6&awEpisodeId=9a1ec5cb-405a-4ebb-8569-fced57c3d129&feed=BqbsxVfO",
             duration = "55"
         ),
         Episode(
@@ -270,6 +277,7 @@ object DummyData {
             title = "Episode 8",
             image = "https://image.simplecastcdn.com/images/00c81e60-45f9-4643-9fed-2184b2b6a3d3/5fbdc9d4-22ab-4b3a-a2bd-72777b15c30c/3000x3000/stitcher-cover-99percentinvisible-3000x3000-r2021-final.jpg",
             description = "How to start a successful tech blog.",
+            uri = "https://dts.podtrac.com/redirect.mp3/chrt.fm/track/288D49/stitcher.simplecastaudio.com/3bb687b0-04af-4257-90f1-39eef4e631b6/episodes/9a1ec5cb-405a-4ebb-8569-fced57c3d129/audio/128/default.mp3?aid=rss_feed&awCollectionId=3bb687b0-04af-4257-90f1-39eef4e631b6&awEpisodeId=9a1ec5cb-405a-4ebb-8569-fced57c3d129&feed=BqbsxVfO",
             duration = "25"
         ),
         Episode(
@@ -277,6 +285,7 @@ object DummyData {
             title = "Episode 9",
             image = "https://image.simplecastcdn.com/images/00c81e60-45f9-4643-9fed-2184b2b6a3d3/5fbdc9d4-22ab-4b3a-a2bd-72777b15c30c/3000x3000/stitcher-cover-99percentinvisible-3000x3000-r2021-final.jpg",
             description = "Understanding blockchain technology.",
+            uri = "https://dts.podtrac.com/redirect.mp3/chrt.fm/track/288D49/stitcher.simplecastaudio.com/3bb687b0-04af-4257-90f1-39eef4e631b6/episodes/9a1ec5cb-405a-4ebb-8569-fced57c3d129/audio/128/default.mp3?aid=rss_feed&awCollectionId=3bb687b0-04af-4257-90f1-39eef4e631b6&awEpisodeId=9a1ec5cb-405a-4ebb-8569-fced57c3d129&feed=BqbsxVfO",
             duration = "60"
         ),
         Episode(
@@ -284,6 +293,7 @@ object DummyData {
             title = "Episode 10",
             image = "https://image.simplecastcdn.com/images/00c81e60-45f9-4643-9fed-2184b2b6a3d3/5fbdc9d4-22ab-4b3a-a2bd-72777b15c30c/3000x3000/stitcher-cover-99percentinvisible-3000x3000-r2021-final.jpg",
             description = "Roundtable discussion with industry experts.",
+            uri = "https://dts.podtrac.com/redirect.mp3/chrt.fm/track/288D49/stitcher.simplecastaudio.com/3bb687b0-04af-4257-90f1-39eef4e631b6/episodes/9a1ec5cb-405a-4ebb-8569-fced57c3d129/audio/128/default.mp3?aid=rss_feed&awCollectionId=3bb687b0-04af-4257-90f1-39eef4e631b6&awEpisodeId=9a1ec5cb-405a-4ebb-8569-fced57c3d129&feed=BqbsxVfO",
             duration = "50"
         )
     )
