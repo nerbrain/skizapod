@@ -1,13 +1,13 @@
 package com.example.skizacast.ui.screens
 
-import android.widget.FrameLayout
+import android.content.Intent
+import androidx.annotation.OptIn
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -17,9 +17,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -28,19 +26,17 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.media3.session.MediaController
-import androidx.media3.ui.PlayerView
+import androidx.media3.common.util.UnstableApi
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.skizacast.R
 import com.example.skizacast.data.model.DummyData
 import com.example.skizacast.data.model.Episode
-import com.example.skizacast.modules.MediaSessionModule
+import com.example.skizacast.player.service.PodcastService
 import com.example.skizacast.viewModels.PodcastEpisodesViewModel
-import com.example.skizacast.viewModels.PodcastPlayerViewModel
 
+@UnstableApi
 @Composable
 fun SelectedPodcastScreen(
     modifier: Modifier = Modifier,
@@ -52,6 +48,10 @@ fun SelectedPodcastScreen(
 
     val image = DummyData.top_podcasts[1].imageUrl
     val description = DummyData.top_podcasts[1].description
+
+//    val sessionToken = SessionToken(context, ComponentName(context,PodcastService::class.java))
+//    val controllerFuture = MediaController.Builder(context, sessionToken).buildAsync()
+
 
     Column (
         modifier = Modifier
@@ -102,7 +102,7 @@ fun EpisodeCard(
     modifier: Modifier,
     episodeTitle: String,
     episodeDuration: String,
-    podcastPlayerViewModel: PodcastPlayerViewModel = hiltViewModel()
+//    podcastPlayerViewModel: PodcastPlayerViewModel = hiltViewModel()
 ){
     val context = LocalContext.current
     Row (
@@ -128,9 +128,11 @@ fun EpisodeCard(
         Spacer(modifier = Modifier.padding(10.dp))
         Text(text = episodeDuration, modifier = Modifier.width(60.dp), color = Color.DarkGray)
         Button(onClick = {
-            podcastPlayerViewModel.apply {
-                startPodcast(context = context)
-            }
+//            podcastPlayerViewModel.apply {
+//                startPodcast(context = context)
+//            }
+            val intent = Intent(context,PodcastService::class.java)
+            context.startService(intent)
         }) {
             Image(
                 painter = painterResource(R.drawable.baseline_play_circle_outline_24),
@@ -141,24 +143,15 @@ fun EpisodeCard(
     }
 }
 
+@UnstableApi
 @Composable
 fun Player(){
-    val context = LocalContext.current
 
-    AndroidView(
-        factory = {
-            PlayerView(context).apply {
-                player = MediaSessionModule.provideExoPlayer(context)
-                layoutParams = FrameLayout.LayoutParams(
-                    FrameLayout.LayoutParams.MATCH_PARENT,
-                    FrameLayout.LayoutParams.MATCH_PARENT
-                )
-            }
-        },
-        modifier = Modifier.fillMaxSize()
-    )
+
 }
 
+
+@OptIn(UnstableApi::class)
 @Preview(showBackground = true)
 @Composable
 fun SelectedPodcastScreenPreview(){
