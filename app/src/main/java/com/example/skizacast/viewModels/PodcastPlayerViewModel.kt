@@ -1,143 +1,176 @@
 package com.example.skizacast.viewModels
 
-import android.app.Application
-import android.content.ComponentName
-import android.util.Log
-import androidx.lifecycle.AndroidViewModel
+import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.media3.common.Player
-import androidx.media3.session.MediaController
-import androidx.media3.session.SessionToken
-import com.example.skizacast.player.service.PodcastService
-import com.google.common.util.concurrent.ListenableFuture
-import com.google.common.util.concurrent.MoreExecutors
+import androidx.lifecycle.viewmodel.compose.saveable
+import androidx.media3.common.MediaItem
+import androidx.media3.common.MediaMetadata
+import com.example.skizacast.data.model.DummyData
+import com.example.skizacast.data.model.Episode
+import com.example.skizacast.player.service.PlayerEvent
+import com.example.skizacast.player.service.PodcastAudioState
+import com.example.skizacast.player.service.PodcastServiceHandler
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import okhttp3.internal.concurrent.formatDuration
+import java.util.concurrent.TimeUnit
+import javax.inject.Inject
+
+private val podcastDummy = Episode(
+    uri = "",
+    title = "",
+    id = "0",
+    description = "",
+    duration = "",
+    image = ""
+)
 
 
-class PodcastPlayerViewModel(application: Application) : AndroidViewModel(application) {
-    val TAG = "PodcastPlayerViewModel"
-    private val _mediaController = MutableStateFlow<MediaController?>(null)
-    val mediaController: StateFlow<MediaController?> = _mediaController.asStateFlow()
+@HiltViewModel
+class PodcastPlayerViewModel @Inject constructor(
+    private val podcastServiceHandler: PodcastServiceHandler,
+    savedStateHandle: SavedStateHandle
+) : ViewModel(){
+    var duration by savedStateHandle.saveable{ mutableStateOf(0L) }
+    var progress by savedStateHandle.saveable{ mutableStateOf(0f) }
+    var progressString by savedStateHandle.saveable{ mutableStateOf("00:00") }
+    var isPlaying by savedStateHandle.saveable{ mutableStateOf(false) }
+    var currentSelectedAudio by savedStateHandle.saveable{ mutableStateOf(podcastDummy) }
+    var audioList by savedStateHandle.saveable { mutableStateOf(listOf<Episode>()) }
 
-    private val _isPlaying = MutableStateFlow(false)
-    val isPlaying: StateFlow<Boolean> = _isPlaying.asStateFlow()
+    private val _uiState: MutableStateFlow<UIState> = MutableStateFlow(UIState.Initial)
+    val uiState: StateFlow<UIState> = _uiState.asStateFlow()
 
-    private var controllerFuture: ListenableFuture<MediaController>
-
-    private val playerListener = object : Player.Listener {
-        override fun onPlaybackStateChanged(playbackState: Int) {
-            updatePlaybackState()
-        }
-
-        override fun onIsPlayingChanged(isPlaying: Boolean) {
-            _isPlaying.value = isPlaying
-            Log.d("PodcastPlayerViewModel", "onIsPlayingChanged: $isPlaying")
-        }
-
-        override fun onEvents(player: Player, events: Player.Events) {
-            if (events.contains(Player.EVENT_POSITION_DISCONTINUITY)) {
-                // Handle track change
-            }
-        }
+    init {
+        loadAudioData()
     }
 
     init {
-        val sessionToken = SessionToken(
-            application,
-            ComponentName(application, PodcastService::class.java)
-        )
-        controllerFuture = MediaController.Builder(application, sessionToken).buildAsync()
-        controllerFuture.addListener({
-            viewModelScope.launch {
-                _mediaController.update { controllerFuture.get() }
-                _mediaController.value?.addListener(playerListener)
-                updatePlaybackState()
-            }
-        }, MoreExecutors.directExecutor())
-    }
-
-    private fun updatePlaybackState() {
         viewModelScope.launch {
-            _isPlaying.value = _mediaController.value?.isPlaying ?: false
-            Log.d("PodcastPlayerViewModel", "updatePlaybackState: isPlaying = ${_isPlaying.value}")
-        }
-    }
+            podcastServiceHandler.audioState.collectLatest { mediaState ->
+                when (mediaState) {
+                    PodcastAudioState.Initial -> _uiState.value = UIState.Initial
+                    is PodcastAudioState.Buffering -> calculateProgressValue(mediaState.progress)
+                    is PodcastAudioState.Playing -> isPlaying = mediaState.isPlaying
+                    is PodcastAudioState.Progress -> calculateProgressValue(mediaState.progress)
+                    is PodcastAudioState.CurrentPlaying -> {
+                        currentSelectedAudio = audioList[mediaState.mediaItemIndex]
+                    }
 
-    override fun onCleared() {
-        super.onCleared()
-        MediaController.releaseFuture(controllerFuture)
-    }
+                    is PodcastAudioState.Ready -> {
+                        duration = mediaState.duration
+                        _uiState.value = UIState.Ready
+                    }
 
-    fun playPause() {
-        Log.d(TAG, "playPause: ")
-        viewModelScope.launch {
-            _mediaController.value?.let { controller ->
-                Log.d(TAG, "playPause: $controller")
-                if (controller.isPlaying) {
-                    controller.pause()
-                } else {
-                    controller.play()
                 }
             }
         }
     }
 
-    fun seekToNext() {
+
+    private fun loadAudioData(){
         viewModelScope.launch {
-            _mediaController.value?.seekToNext()
+            val audio = DummyData.podcastEpisodesData
+            audioList = audio
+            setMediaItems()
         }
     }
 
-    fun seekToPrevious() {
-        viewModelScope.launch {
-            _mediaController.value?.seekToPrevious()
+
+    private fun setMediaItems(){
+        audioList.map { audio ->
+            MediaItem.Builder()
+                .setUri(audio.uri)
+                .setMediaMetadata(
+                    MediaMetadata.Builder()
+                        .setDisplayTitle(audio.title)
+                        .setSubtitle(audio.description)
+                        .build()
+                )
+                .build()
+        }
+            .also {
+            podcastServiceHandler.setMediaItemList(it)
         }
     }
 
-    fun seekTo(position: Long) {
-        viewModelScope.launch {
-            _mediaController.value?.seekTo(position)
+    private fun calculateProgressValue(currentProgress: Long) {
+        progress =
+            if (currentProgress > 0) ((currentProgress.toFloat() / duration.toFloat()) * 100f)
+            else 0f
+        progressString = formatDuration(currentProgress)
+    }
+
+    fun onUiEvents(uiEvents: UIEvents) = viewModelScope.launch {
+        when (uiEvents) {
+            UIEvents.Backward -> podcastServiceHandler.onPlayerEvents(PlayerEvent.Backward)
+            UIEvents.Forward -> podcastServiceHandler.onPlayerEvents(PlayerEvent.Forward)
+            UIEvents.SeekToNext -> podcastServiceHandler.onPlayerEvents(PlayerEvent.SeekToNext)
+            is UIEvents.PlayPause -> {
+                podcastServiceHandler.onPlayerEvents(
+                    PlayerEvent.PlayPause
+                )
+            }
+
+            is UIEvents.SeekTo -> {
+                podcastServiceHandler.onPlayerEvents(
+                    PlayerEvent.SeekTo,
+                    seekPosition = ((duration * uiEvents.position) / 100f).toLong()
+                )
+            }
+
+            is UIEvents.SelectedAudioChange -> {
+                podcastServiceHandler.onPlayerEvents(
+                    PlayerEvent.SelectedAudioChange,
+                    selectedAudioIndex = uiEvents.index
+                )
+            }
+
+            is UIEvents.UpdateProgress -> {
+                podcastServiceHandler.onPlayerEvents(
+                    PlayerEvent.UpdateProgress(
+                        uiEvents.newProgress
+                    )
+                )
+                progress = uiEvents.newProgress
+            }
         }
     }
+
+    fun formatDuration(duration: Long): String {
+        val minute = TimeUnit.MINUTES.convert(duration, TimeUnit.MILLISECONDS)
+        val seconds = (minute) - minute * TimeUnit.SECONDS.convert(1, TimeUnit.MINUTES)
+        return String.format("%02d:%02d", minute, seconds)
+    }
+
+    override fun onCleared() {
+        viewModelScope.launch {
+            podcastServiceHandler.onPlayerEvents(PlayerEvent.Stop)
+        }
+        super.onCleared()
+    }
+
+
 }
 
-//@HiltViewModel
-//class PodcastPlayerViewModel @Inject constructor(
-//    private val exoPlayer: ExoPlayer,
-//    private val mediaSession: MediaSession
-//) : ViewModel() {
-//
-//    fun initializePlayer(context: Context){
-//        // Ensure ExoPlayer is properly initialized
-//        if (exoPlayer.playbackState == ExoPlayer.STATE_IDLE) {
-//            Log.d("PodcastPlayerViewModel", "Initializing ExoPlayer")
-//            mediaSession // This ensures the MediaSession is created and bound
-//        }
-//    }
-//
-//    fun releasePlayer() {
-//        Log.d("PodcastPlayerViewModel", "Releasing ExoPlayer")
-//        exoPlayer.playWhenReady = false
-//        exoPlayer.release()
-//    }
-//
-//
-//    fun startPodcast(context: Context){
-//        Log.d("PodcastPlayerViewModel", "Playing Podcast")
-//        exoPlayer.apply {
-//            stop()
-//            clearMediaItems()
-//            val mediaItem = MediaItem.fromUri(Uri.parse("https://dts.podtrac.com/redirect.mp3/chrt.fm/track/288D49/stitcher.simplecastaudio.com/3bb687b0-04af-4257-90f1-39eef4e631b6/episodes/9a1ec5cb-405a-4ebb-8569-fced57c3d129/audio/128/default.mp3?aid=rss_feed&awCollectionId=3bb687b0-04af-4257-90f1-39eef4e631b6&awEpisodeId=9a1ec5cb-405a-4ebb-8569-fced57c3d129&feed=BqbsxVfO"))
-//            Log.d("PodcastPlayerViewModel", "Media Item URI: $mediaItem.uri")
-//            setMediaItem(mediaItem)
-//            playWhenReady = true
-//            prepare()
-//            play()
-//            Log.d("PodcastPlayerViewModel", "Podcast is prepared and playing")
-//        }
-//    }
-//}
+
+sealed class UIEvents{
+    object PlayPause : UIEvents()
+    data class SelectedAudioChange(val index: Int) : UIEvents()
+    data class SeekTo(val position: Float) : UIEvents()
+    object SeekToNext : UIEvents()
+    object Backward : UIEvents()
+    object Forward : UIEvents()
+    data class UpdateProgress(val newProgress: Float) : UIEvents()
+}
+
+sealed class UIState{
+    object Initial : UIState()
+    object Ready : UIState()
+}

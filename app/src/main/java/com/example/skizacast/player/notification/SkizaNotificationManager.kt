@@ -85,7 +85,6 @@ class SkizaNotificationManager @Inject constructor(
             NOTIFICATION_CHANNEL_NAME,
             NotificationManager.IMPORTANCE_LOW
         )
-
         notificationManager.createNotificationChannel(channel)
     }
 

@@ -69,6 +69,7 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
+    implementation ("androidx.compose.material:material-icons-extended")
     //Hilt
     implementation ("androidx.hilt:hilt-navigation-compose:1.2.0")
     implementation("com.google.dagger:hilt-android:2.51.1")
@@ -83,6 +84,8 @@ dependencies {
     implementation ("androidx.media3:media3-common:1.3.1")
     implementation ("androidx.media3:media3-session:1.3.1")
     implementation("androidx.legacy:legacy-support-v4:1.0.0") // Needed MediaSessionCompat.Token
+
+    implementation ("com.google.accompanist:accompanist-permissions:0.30.0")
 }
 
 kapt {

@@ -1,6 +1,5 @@
 package com.example.skizacast.ui.screens
 
-import android.content.Intent
 import androidx.annotation.OptIn
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
@@ -13,7 +12,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -33,7 +32,6 @@ import coil.request.ImageRequest
 import com.example.skizacast.R
 import com.example.skizacast.data.model.DummyData
 import com.example.skizacast.data.model.Episode
-import com.example.skizacast.player.service.PodcastService
 import com.example.skizacast.viewModels.PodcastEpisodesViewModel
 
 @UnstableApi
@@ -41,17 +39,13 @@ import com.example.skizacast.viewModels.PodcastEpisodesViewModel
 fun SelectedPodcastScreen(
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp),
+    onItemClick: (Int) -> Unit,
     podcastEpisodesViewModel: PodcastEpisodesViewModel = hiltViewModel(),
 ) {
-
     val podcastEpisodes = podcastEpisodesViewModel.episode.collectAsState()
 
     val image = DummyData.top_podcasts[1].imageUrl
     val description = DummyData.top_podcasts[1].description
-
-//    val sessionToken = SessionToken(context, ComponentName(context,PodcastService::class.java))
-//    val controllerFuture = MediaController.Builder(context, sessionToken).buildAsync()
-
 
     Column (
         modifier = Modifier
@@ -73,23 +67,25 @@ fun SelectedPodcastScreen(
 
         Spacer(modifier = Modifier.padding(8.dp))
 
-        PodcastEpisodes(episodes = podcastEpisodes.value, modifier = modifier)
+        PodcastEpisodes(episodes = podcastEpisodes.value, modifier = modifier, onItemClick)
     }
 }
 
 @Composable
 fun PodcastEpisodes(
     episodes: List<Episode>,
-    modifier: Modifier
+    modifier: Modifier,
+    onItemClick: (Int) -> Unit,
 ){
     Column {
         LazyColumn {
-            items(episodes){ episode ->
+            itemsIndexed(episodes){ index, episode ->
                 EpisodeCard(
                     image = episode.image,
                     modifier = modifier,
                     episodeTitle = episode.title,
-                    episodeDuration = episode.duration
+                    episodeDuration = episode.duration,
+                    onItemClick = {onItemClick(index)}
                 )
             }
         }
@@ -102,9 +98,8 @@ fun EpisodeCard(
     modifier: Modifier,
     episodeTitle: String,
     episodeDuration: String,
-//    podcastPlayerViewModel: PodcastPlayerViewModel = hiltViewModel()
+    onItemClick: () -> Unit
 ){
-    val context = LocalContext.current
     Row (
         modifier = Modifier
             .fillMaxWidth()
@@ -127,13 +122,7 @@ fun EpisodeCard(
         Text(text = episodeTitle, modifier = Modifier.width(150.dp))
         Spacer(modifier = Modifier.padding(10.dp))
         Text(text = episodeDuration, modifier = Modifier.width(60.dp), color = Color.DarkGray)
-        Button(onClick = {
-//            podcastPlayerViewModel.apply {
-//                startPodcast(context = context)
-//            }
-            val intent = Intent(context,PodcastService::class.java)
-            context.startService(intent)
-        }) {
+        Button(onClick = onItemClick) {
             Image(
                 painter = painterResource(R.drawable.baseline_play_circle_outline_24),
                 contentDescription = "Play Button"
@@ -143,30 +132,22 @@ fun EpisodeCard(
     }
 }
 
-@UnstableApi
-@Composable
-fun Player(){
 
-
-}
 
 
 @OptIn(UnstableApi::class)
 @Preview(showBackground = true)
 @Composable
 fun SelectedPodcastScreenPreview(){
-    SelectedPodcastScreen(
-
-    )
 }
 
 @Preview(showBackground = true)
 @Composable
 fun EpisodeCardPreview(){
-    EpisodeCard(
-        image = "https://image.simplecastcdn.com/images/00c81e60-45f9-4643-9fed-2184b2b6a3d3/5fbdc9d4-22ab-4b3a-a2bd-72777b15c30c/3000x3000/stitcher-cover-99percentinvisible-3000x3000-r2021-final.jpg",
-        modifier = Modifier,
-        episodeTitle = "Experiences and stories",
-        episodeDuration = "20:21"
-    )
+//    EpisodeCard(
+//        image = "https://image.simplecastcdn.com/images/00c81e60-45f9-4643-9fed-2184b2b6a3d3/5fbdc9d4-22ab-4b3a-a2bd-72777b15c30c/3000x3000/stitcher-cover-99percentinvisible-3000x3000-r2021-final.jpg",
+//        modifier = Modifier,
+//        episodeTitle = "Experiences and stories",
+//        episodeDuration = "20:21"
+//    )
 }

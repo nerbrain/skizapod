@@ -23,6 +23,10 @@ class PodcastServiceHandler @Inject constructor(
 
     private var job: Job? = null
 
+    init {
+        exoPlayer.addListener(this)
+    }
+
     fun addMediaItem(mediaItem: MediaItem) {
         exoPlayer.setMediaItem(mediaItem)
         exoPlayer.prepare()
