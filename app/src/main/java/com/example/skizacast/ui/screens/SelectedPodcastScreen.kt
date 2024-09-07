@@ -2,6 +2,7 @@ package com.example.skizacast.ui.screens
 
 import androidx.annotation.OptIn
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -103,9 +104,10 @@ fun EpisodeCard(
     Row (
         modifier = Modifier
             .fillMaxWidth()
-            .height(70.dp)
+            .height(90.dp)
             .padding(8.dp),
         verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceEvenly
     ){
         AsyncImage(model = ImageRequest.Builder(context = LocalContext.current)
             .data(image)
@@ -114,18 +116,20 @@ fun EpisodeCard(
             contentDescription = "99Pi",
             placeholder = painterResource(R.drawable.loading_img),
             modifier = modifier
-                .width(60.dp)
-                .height(60.dp))
+                .fillMaxWidth(0.2f)
+                .fillMaxHeight()
+        )
 
-        Spacer(modifier = Modifier.padding(10.dp))
+        Spacer(modifier = Modifier.padding(4.dp))
 
-        Text(text = episodeTitle, modifier = Modifier.width(150.dp))
-        Spacer(modifier = Modifier.padding(10.dp))
-        Text(text = episodeDuration, modifier = Modifier.width(60.dp), color = Color.DarkGray)
-        Button(onClick = onItemClick) {
+        Text(text = episodeTitle, modifier = Modifier.fillMaxWidth(0.5f))
+        Spacer(modifier = Modifier.padding(5.dp))
+        Text(text = episodeDuration, modifier = Modifier.fillMaxWidth(0.3f), color = Color.DarkGray)
+        Button(onClick = onItemClick, modifier = Modifier.fillMaxWidth(0.8f)) {
             Image(
                 painter = painterResource(R.drawable.baseline_play_circle_outline_24),
-                contentDescription = "Play Button"
+                contentDescription = "Play Button",
+                modifier = Modifier.fillMaxWidth()
             )
         }
 
@@ -144,10 +148,11 @@ fun SelectedPodcastScreenPreview(){
 @Preview(showBackground = true)
 @Composable
 fun EpisodeCardPreview(){
-//    EpisodeCard(
-//        image = "https://image.simplecastcdn.com/images/00c81e60-45f9-4643-9fed-2184b2b6a3d3/5fbdc9d4-22ab-4b3a-a2bd-72777b15c30c/3000x3000/stitcher-cover-99percentinvisible-3000x3000-r2021-final.jpg",
-//        modifier = Modifier,
-//        episodeTitle = "Experiences and stories",
-//        episodeDuration = "20:21"
-//    )
+   EpisodeCard(
+        image = "https://image.simplecastcdn.com/images/00c81e60-45f9-4643-9fed-2184b2b6a3d3/5fbdc9d4-22ab-4b3a-a2bd-72777b15c30c/3000x3000/stitcher-cover-99percentinvisible-3000x3000-r2021-final.jpg",
+        modifier = Modifier,
+        episodeTitle = "Experiences and stories",
+        episodeDuration = "20:21",
+        onItemClick = {}
+    )
 }

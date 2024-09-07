@@ -1,8 +1,10 @@
 package com.example.skizacast.ui
 
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -21,13 +23,19 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.media3.common.util.UnstableApi
+import androidx.navigation.NavHost
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.example.skizacast.R
 import com.example.skizacast.player.service.PodcastService
 import com.example.skizacast.ui.components.BottomBar
+import com.example.skizacast.ui.screens.HomeScreen
 import com.example.skizacast.ui.screens.SelectedPodcastScreen
 import com.example.skizacast.viewModels.PodcastPlayerViewModel
 import com.example.skizacast.viewModels.UIEvents
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @androidx.annotation.OptIn(UnstableApi::class)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -52,17 +60,7 @@ fun SkizaPodApp(podcastPlayerViewModel: PodcastPlayerViewModel = viewModel()){
         Surface (
             modifier = Modifier.fillMaxSize()
         ){
-//            HomeScreen(
-//                contentPadding = it
-//            )
-
-            SelectedPodcastScreen(
-                contentPadding = it,
-                onItemClick = {
-//                    podcastPlayerViewModel.onUiEvents(UIEvents.SelectedAudioChange(it))
-                    play(it,context,podcastPlayerViewModel)
-                }
-            )
+            SkizaApp(contentPadding = it)
         }
     }
 }
@@ -86,4 +84,25 @@ fun SkizaPodTopAppBar(scrollBehavior: TopAppBarScrollBehavior, modifier: Modifie
         },
         modifier = modifier
     )
+}
+
+@Composable
+fun SkizaApp(podcastPlayerViewModel: PodcastPlayerViewModel = viewModel(), contentPadding: PaddingValues){
+    val navController = rememberNavController()
+    val context = LocalContext.current
+    NavHost(
+        navController,
+        startDestination = "pod"
+    ){
+        composable(route = "pod") {
+            HomeScreen(contentPadding = contentPadding)
+        }
+        composable(route = "pod/{pod_id}"){
+            SelectedPodcastScreen(
+                contentPadding = contentPadding,
+                onItemClick = {
+                play(it, context, podcastPlayerViewModel)
+            })
+        }
+    }
 }

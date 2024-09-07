@@ -28,23 +28,6 @@ class PodcastService: MediaSessionService() {
     @Inject
     lateinit var notificationManager: SkizaNotificationManager
 
-//    override fun onCreate() {
-//        super.onCreate()
-//        player = MediaSessionModule.provideExoPlayer(this)
-//        mediaSession = MediaSessionModule.provideMediaSession(this,player)
-//
-//        player.apply {
-//            stop()
-//            clearMediaItems()
-//            val mediaItem = MediaItem.fromUri(Uri.parse("https://dts.podtrac.com/redirect.mp3/chrt.fm/track/288D49/stitcher.simplecastaudio.com/3bb687b0-04af-4257-90f1-39eef4e631b6/episodes/9a1ec5cb-405a-4ebb-8569-fced57c3d129/audio/128/default.mp3?aid=rss_feed&awCollectionId=3bb687b0-04af-4257-90f1-39eef4e631b6&awEpisodeId=9a1ec5cb-405a-4ebb-8569-fced57c3d129&feed=BqbsxVfO"))
-//            Log.d("PodcastService", "Media Item URI: $mediaItem.uri")
-//            setMediaItem(mediaItem)
-//            playWhenReady = true
-//            prepare()
-//            play()
-//            Log.d("PodcastService", "Podcast is prepared and playing")
-//        }
-//    }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -55,7 +38,6 @@ class PodcastService: MediaSessionService() {
         }
         return super.onStartCommand(intent, flags, startId)
     }
-
 
     override fun onBind(intent: Intent?): IBinder? {
         super.onBind(intent)

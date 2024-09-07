@@ -125,25 +125,6 @@ fun PodcastInfo(
         ) { }
         
         Spacer(modifier = Modifier.padding(4.dp))
-
-//        Column {
-//            Text(
-//                text = episode.title,
-//                fontWeight = FontWeight.Bold,
-//                style = MaterialTheme.typography.titleLarge,
-//                overflow = TextOverflow.Clip,
-//                modifier = Modifier.weight(1f),
-//                maxLines = 1
-//            )
-//            Spacer(modifier = Modifier.size(4.dp))
-//            Text(
-//                text = episode.description,
-//                fontWeight = FontWeight.Normal,
-//                style = MaterialTheme.typography.bodySmall,
-//                overflow = TextOverflow.Clip,
-//                maxLines = 1
-//            )
-//        }
     }
 }
 
