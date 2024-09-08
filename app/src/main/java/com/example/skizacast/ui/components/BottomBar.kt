@@ -38,7 +38,6 @@ import com.example.skizacast.data.model.Episode
 fun BottomBar(
     progress: Float,
     onProgress: (Float) -> Unit,
-    episode: Episode,
     isAudioPlaying: Boolean,
     onStart: () -> Unit,
     onNext: () -> Unit,
@@ -57,7 +56,6 @@ fun BottomBar(
                     verticalAlignment = Alignment.CenterVertically
                 ){
                     PodcastInfo(
-                        episode = episode,
                         modifier = Modifier.weight(1f)
                     )
 
@@ -110,7 +108,6 @@ fun MediaPlayerController(
 @Composable
 fun PodcastInfo(
     modifier: Modifier = Modifier,
-    episode: Episode
 ){
     Row (
         modifier = Modifier.padding(4.dp),

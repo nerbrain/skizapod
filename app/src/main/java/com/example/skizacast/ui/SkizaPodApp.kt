@@ -28,6 +28,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.skizacast.R
+import com.example.skizacast.data.model.Episode
 import com.example.skizacast.player.service.PodcastService
 import com.example.skizacast.ui.components.BottomBar
 import com.example.skizacast.ui.screens.HomeScreen
@@ -43,6 +44,8 @@ fun SkizaPodApp(podcastPlayerViewModel: PodcastPlayerViewModel = viewModel()){
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     val context = LocalContext.current
 
+
+
     Scaffold (
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = { SkizaPodTopAppBar(scrollBehavior = scrollBehavior) },
@@ -50,7 +53,6 @@ fun SkizaPodApp(podcastPlayerViewModel: PodcastPlayerViewModel = viewModel()){
             BottomBar(
                 progress = podcastPlayerViewModel.progress,
                 onProgress = { podcastPlayerViewModel.onUiEvents(UIEvents.SeekTo(it)) },
-                episode = podcastPlayerViewModel.currentSelectedAudio,
                 isAudioPlaying = podcastPlayerViewModel.isPlaying,
                 onStart = { podcastPlayerViewModel.onUiEvents(UIEvents.PlayPause)},
                 onNext = {podcastPlayerViewModel.onUiEvents(UIEvents.SeekToNext)}
@@ -60,13 +62,19 @@ fun SkizaPodApp(podcastPlayerViewModel: PodcastPlayerViewModel = viewModel()){
         Surface (
             modifier = Modifier.fillMaxSize()
         ){
-            SkizaApp(contentPadding = it)
+            SelectedPodcastScreen(
+                contentPadding = it,
+                onItemClick = {
+                    play(it, context, podcastPlayerViewModel)
+                }
+            )
         }
     }
 }
 
-fun play(it: Int, context: Context, podcastPlayerViewModel: PodcastPlayerViewModel){
-    podcastPlayerViewModel.onUiEvents(UIEvents.SelectedAudioChange(it))
+fun play(it: Episode, context: Context, podcastPlayerViewModel: PodcastPlayerViewModel){
+    podcastPlayerViewModel.setMediaItem(it)
+    podcastPlayerViewModel.onUiEvents(UIEvents.SelectedAudioChange(it.id.toInt()))
     val intent = Intent(context, PodcastService::class.java)
     context.startService(intent)
 }

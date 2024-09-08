@@ -40,7 +40,7 @@ import com.example.skizacast.viewModels.PodcastEpisodesViewModel
 fun SelectedPodcastScreen(
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp),
-    onItemClick: (Int) -> Unit,
+    onItemClick: (Episode) -> Unit,
     podcastEpisodesViewModel: PodcastEpisodesViewModel = hiltViewModel(),
 ) {
     val podcastEpisodes = podcastEpisodesViewModel.episode.collectAsState()
@@ -76,7 +76,7 @@ fun SelectedPodcastScreen(
 fun PodcastEpisodes(
     episodes: List<Episode>,
     modifier: Modifier,
-    onItemClick: (Int) -> Unit,
+    onItemClick: (Episode) -> Unit,
 ){
     Column {
         LazyColumn {
@@ -86,7 +86,7 @@ fun PodcastEpisodes(
                     modifier = modifier,
                     episodeTitle = episode.title,
                     episodeDuration = episode.duration,
-                    onItemClick = {onItemClick(index)}
+                    onItemClick = {onItemClick(episode)}
                 )
             }
         }

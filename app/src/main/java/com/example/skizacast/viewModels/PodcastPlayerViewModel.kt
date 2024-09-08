@@ -1,5 +1,6 @@
 package com.example.skizacast.viewModels
 
+import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -47,8 +48,10 @@ class PodcastPlayerViewModel @Inject constructor(
     private val _uiState: MutableStateFlow<UIState> = MutableStateFlow(UIState.Initial)
     val uiState: StateFlow<UIState> = _uiState.asStateFlow()
 
+    val TAG = "PodcastPlayerViewModel"
+
     init {
-        loadAudioData()
+//        loadAudioData()
     }
 
     init {
@@ -60,7 +63,7 @@ class PodcastPlayerViewModel @Inject constructor(
                     is PodcastAudioState.Playing -> isPlaying = mediaState.isPlaying
                     is PodcastAudioState.Progress -> calculateProgressValue(mediaState.progress)
                     is PodcastAudioState.CurrentPlaying -> {
-                        currentSelectedAudio = audioList[mediaState.mediaItemIndex]
+//                        currentSelectedAudio = audioList[mediaState.mediaItemIndex]
                     }
 
                     is PodcastAudioState.Ready -> {
@@ -82,6 +85,21 @@ class PodcastPlayerViewModel @Inject constructor(
         }
     }
 
+    fun setMediaItem(episode: Episode){
+        MediaItem.Builder()
+            .setUri(episode.uri)
+            .setMediaMetadata(
+                MediaMetadata.Builder()
+                    .setDisplayTitle(episode.title)
+                    .setSubtitle(episode.description)
+                    .build()
+            )
+            .build()
+            .also {
+                podcastServiceHandler.addMediaItem(it)
+
+            }
+    }
 
     private fun setMediaItems(){
         audioList.map { audio ->
@@ -126,6 +144,7 @@ class PodcastPlayerViewModel @Inject constructor(
             }
 
             is UIEvents.SelectedAudioChange -> {
+                Log.d(TAG, "onUiEvents: SelectedAudioChange 1")
                 podcastServiceHandler.onPlayerEvents(
                     PlayerEvent.SelectedAudioChange,
                     selectedAudioIndex = uiEvents.index

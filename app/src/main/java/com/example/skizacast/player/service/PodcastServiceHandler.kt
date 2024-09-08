@@ -1,5 +1,6 @@
 package com.example.skizacast.player.service
 
+import android.util.Log
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
@@ -20,6 +21,8 @@ class PodcastServiceHandler @Inject constructor(
     private val _audioState: MutableStateFlow<PodcastAudioState> =
         MutableStateFlow(PodcastAudioState.Initial)
     val audioState: StateFlow<PodcastAudioState> = _audioState.asStateFlow()
+
+    val TAG = "PodcastServiceHandler"
 
     private var job: Job? = null
 
@@ -50,6 +53,7 @@ class PodcastServiceHandler @Inject constructor(
             PlayerEvent.SeekTo -> exoPlayer.seekTo(seekPosition)
             PlayerEvent.SelectedAudioChange -> {
                 when (selectedAudioIndex) {
+                    Log.d(TAG, "SelectedAudioChange: 2"),
                     exoPlayer.currentMediaItemIndex -> {
                         playOrPause()
                     }
