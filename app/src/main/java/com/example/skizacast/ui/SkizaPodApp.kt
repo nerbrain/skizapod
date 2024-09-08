@@ -62,12 +62,7 @@ fun SkizaPodApp(podcastPlayerViewModel: PodcastPlayerViewModel = viewModel()){
         Surface (
             modifier = Modifier.fillMaxSize()
         ){
-            SelectedPodcastScreen(
-                contentPadding = it,
-                onItemClick = {
-                    play(it, context, podcastPlayerViewModel)
-                }
-            )
+            SkizaApp(contentPadding = it)
         }
     }
 }
@@ -103,7 +98,9 @@ fun SkizaApp(podcastPlayerViewModel: PodcastPlayerViewModel = viewModel(), conte
         startDestination = "pod"
     ){
         composable(route = "pod") {
-            HomeScreen(contentPadding = contentPadding)
+            HomeScreen(contentPadding = contentPadding){ id ->
+                navController.navigate("pod/{id}")
+            }
         }
         composable(route = "pod/{pod_id}"){
             SelectedPodcastScreen(
