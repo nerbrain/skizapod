@@ -1,5 +1,6 @@
 package com.example.skizacast.ui.screens
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -9,6 +10,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -38,14 +41,17 @@ fun HomeScreen(
     contentPadding: PaddingValues = PaddingValues(0.dp),
     topPodcastViewModel: TopPodcastViewModel = hiltViewModel(),
     socialPodcastViewModel: SocialPodcastViewModel = hiltViewModel(),
-    businessPodcastViewModel: BusinessPodcastViewModel = hiltViewModel()
+    businessPodcastViewModel: BusinessPodcastViewModel = hiltViewModel(),
+    onItemClick: (id: String) -> Unit = {}
 ){
     val topPodcastList = topPodcastViewModel.podcasts.collectAsState()
     val socialPodcastList = socialPodcastViewModel.podcast.collectAsState()
     val businessPodcastList = businessPodcastViewModel.podcast.collectAsState()
 
     Column (
-        modifier = Modifier.padding(contentPadding)
+        modifier = Modifier
+            .padding(contentPadding)
+            .verticalScroll(rememberScrollState())
     ){
         Text(
             text = stringResource(R.string.top_podcasts),
@@ -54,7 +60,7 @@ fun HomeScreen(
             textAlign = TextAlign.Left,
             modifier = Modifier.padding(4.dp)
         )
-        TopPodcastsHorizontalScroll(podcasts = topPodcastList.value, modifier = modifier)
+        TopPodcastsHorizontalScroll(podcasts = topPodcastList.value, modifier = modifier, onItemClick = { id -> onItemClick(id)})
 
         Spacer(modifier = Modifier.padding(8.dp))
 
@@ -66,7 +72,7 @@ fun HomeScreen(
             modifier = Modifier.padding(4.dp)
         )
 
-        TopPodcastsSocialCulture(podcasts = socialPodcastList.value, modifier = modifier)
+        TopPodcastsSocialCulture(podcasts = socialPodcastList.value, modifier = modifier, onItemClick = { id -> onItemClick(id)})
 
         Spacer(modifier = Modifier.padding(8.dp))
 
@@ -78,7 +84,7 @@ fun HomeScreen(
             modifier = Modifier.padding(4.dp)
         )
 
-        TopPodcastsBusiness(podcasts = businessPodcastList.value, modifier = modifier)
+        TopPodcastsBusiness(podcasts = businessPodcastList.value, modifier = modifier, onItemClick = { id -> onItemClick(id)})
 
     }
 }
@@ -87,7 +93,8 @@ fun HomeScreen(
 fun TopPodcastsHorizontalScroll(
     podcasts: List<Podcast>,
     modifier: Modifier,
-    contentPadding: PaddingValues = PaddingValues(0.dp)
+    contentPadding: PaddingValues = PaddingValues(0.dp),
+    onItemClick: (id: String) -> Unit
 ){
     LazyRow(
         modifier = modifier.padding(horizontal = 0.dp),
@@ -100,6 +107,7 @@ fun TopPodcastsHorizontalScroll(
                 modifier = modifier
                     .padding(4.dp)
                     .fillMaxWidth()
+                    .clickable { onItemClick(podcast.id) }
             )
         }
     }
@@ -108,24 +116,8 @@ fun TopPodcastsHorizontalScroll(
 @Composable
 fun TopPodcastsSocialCulture(
     podcasts: List<Podcast>,
-    modifier: Modifier
-){
-    LazyRow {
-        items(podcasts){podcast ->
-            PodcastCard(
-                image = podcast.imageUrl,
-                title = podcast.title,
-                modifier = modifier
-                    .padding(4.dp)
-                    .fillMaxWidth())
-        }
-    }
-}
-
-@Composable
-fun TopPodcastsBusiness(
-    podcasts: List<Podcast>,
-    modifier: Modifier
+    modifier: Modifier,
+    onItemClick: (id: String) -> Unit
 ){
     LazyRow {
         items(podcasts){podcast ->
@@ -135,6 +127,27 @@ fun TopPodcastsBusiness(
                 modifier = modifier
                     .padding(4.dp)
                     .fillMaxWidth()
+                    .clickable { onItemClick(podcast.id) }
+            )
+        }
+    }
+}
+
+@Composable
+fun TopPodcastsBusiness(
+    podcasts: List<Podcast>,
+    modifier: Modifier,
+    onItemClick: (id: String) -> Unit
+){
+    LazyRow {
+        items(podcasts){podcast ->
+            PodcastCard(
+                image = podcast.imageUrl,
+                title = podcast.title,
+                modifier = modifier
+                    .padding(4.dp)
+                    .fillMaxWidth()
+                    .clickable { onItemClick(podcast.id) }
             )
         }
     }
@@ -179,5 +192,5 @@ fun CardPreview(
 @Preview(showBackground = true)
 @Composable
 fun HomeScreenPreview(){
-    HomeScreen()
+//    HomeScreen()
 }

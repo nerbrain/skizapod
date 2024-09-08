@@ -1,65 +1,195 @@
 package com.example.skizacast.viewModels
 
-import android.content.Context
-import android.media.session.MediaController
-import android.net.Uri
 import android.util.Log
-import androidx.annotation.OptIn
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.saveable
 import androidx.media3.common.MediaItem
-import androidx.media3.common.PlaybackException
-import androidx.media3.common.util.UnstableApi
-import androidx.media3.exoplayer.ExoPlayer
-import androidx.media3.exoplayer.analytics.AnalyticsListener
-import androidx.media3.session.MediaSession
-import androidx.media3.session.SessionToken
+import androidx.media3.common.MediaMetadata
+import com.example.skizacast.data.model.DummyData
+import com.example.skizacast.data.model.Episode
+import com.example.skizacast.player.service.PlayerEvent
+import com.example.skizacast.player.service.PodcastAudioState
+import com.example.skizacast.player.service.PodcastServiceHandler
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
+import okhttp3.internal.concurrent.formatDuration
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+
+private val podcastDummy = Episode(
+    uri = "",
+    title = "",
+    id = "0",
+    description = "",
+    duration = "",
+    image = ""
+)
+
 
 @HiltViewModel
 class PodcastPlayerViewModel @Inject constructor(
-    private val exoPlayer: ExoPlayer,
-    private val mediaSession: MediaSession
-) : ViewModel() {
+    private val podcastServiceHandler: PodcastServiceHandler,
+    savedStateHandle: SavedStateHandle
+) : ViewModel(){
+    var duration by savedStateHandle.saveable{ mutableStateOf(0L) }
+    var progress by savedStateHandle.saveable{ mutableStateOf(0f) }
+    var progressString by savedStateHandle.saveable{ mutableStateOf("00:00") }
+    var isPlaying by savedStateHandle.saveable{ mutableStateOf(false) }
+    var currentSelectedAudio by savedStateHandle.saveable{ mutableStateOf(podcastDummy) }
+    var audioList by savedStateHandle.saveable { mutableStateOf(listOf<Episode>()) }
 
-    fun initializePlayer(context: Context){
-        // Ensure ExoPlayer is properly initialized
-        if (exoPlayer.playbackState == ExoPlayer.STATE_IDLE) {
-            Log.d("PodcastPlayerViewModel", "Initializing ExoPlayer")
-            mediaSession // This ensures the MediaSession is created and bound
-        }
+    private val _uiState: MutableStateFlow<UIState> = MutableStateFlow(UIState.Initial)
+    val uiState: StateFlow<UIState> = _uiState.asStateFlow()
+
+    val TAG = "PodcastPlayerViewModel"
+
+    init {
+//        loadAudioData()
     }
 
-    fun releasePlayer() {
-        Log.d("PodcastPlayerViewModel", "Releasing ExoPlayer")
-        exoPlayer.playWhenReady = false
-        exoPlayer.release()
-    }
+    init {
+        viewModelScope.launch {
+            podcastServiceHandler.audioState.collectLatest { mediaState ->
+                when (mediaState) {
+                    PodcastAudioState.Initial -> _uiState.value = UIState.Initial
+                    is PodcastAudioState.Buffering -> calculateProgressValue(mediaState.progress)
+                    is PodcastAudioState.Playing -> isPlaying = mediaState.isPlaying
+                    is PodcastAudioState.Progress -> calculateProgressValue(mediaState.progress)
+                    is PodcastAudioState.CurrentPlaying -> {
+//                        currentSelectedAudio = audioList[mediaState.mediaItemIndex]
+                    }
 
+                    is PodcastAudioState.Ready -> {
+                        duration = mediaState.duration
+                        _uiState.value = UIState.Ready
+                    }
 
-    fun startPodcast(context: Context){
-        Log.d("PodcastPlayerViewModel", "Playing Podcast")
-        exoPlayer.apply {
-            stop()
-            clearMediaItems()
-            val mediaItem = MediaItem.fromUri(Uri.parse("https://dts.podtrac.com/redirect.mp3/chrt.fm/track/288D49/stitcher.simplecastaudio.com/3bb687b0-04af-4257-90f1-39eef4e631b6/episodes/9a1ec5cb-405a-4ebb-8569-fced57c3d129/audio/128/default.mp3?aid=rss_feed&awCollectionId=3bb687b0-04af-4257-90f1-39eef4e631b6&awEpisodeId=9a1ec5cb-405a-4ebb-8569-fced57c3d129&feed=BqbsxVfO"))
-            Log.d("PodcastPlayerViewModel", "Media Item URI: $mediaItem.uri")
-            setMediaItem(mediaItem)
-            playWhenReady = true
-            prepare()
-            play()
-            Log.d("PodcastPlayerViewModel", "Podcast is prepared and playing")
-
-            addAnalyticsListener(object : AnalyticsListener{
-                @OptIn(UnstableApi::class)
-                override fun onPlayerError(
-                    eventTime: AnalyticsListener.EventTime,
-                    error: PlaybackException
-                ) {
-                    Log.d("PodcastPlayerViewModel", "Player error: ${error.message}", error)
                 }
-            })
+            }
         }
     }
+
+
+    private fun loadAudioData(){
+        viewModelScope.launch {
+            val audio = DummyData.podcastEpisodesData
+            audioList = audio
+            setMediaItems()
+        }
+    }
+
+    fun setMediaItem(episode: Episode){
+        MediaItem.Builder()
+            .setUri(episode.uri)
+            .setMediaMetadata(
+                MediaMetadata.Builder()
+                    .setDisplayTitle(episode.title)
+                    .setSubtitle(episode.description)
+                    .build()
+            )
+            .build()
+            .also {
+                podcastServiceHandler.addMediaItem(it)
+
+            }
+    }
+
+    private fun setMediaItems(){
+        audioList.map { audio ->
+            MediaItem.Builder()
+                .setUri(audio.uri)
+                .setMediaMetadata(
+                    MediaMetadata.Builder()
+                        .setDisplayTitle(audio.title)
+                        .setSubtitle(audio.description)
+                        .build()
+                )
+                .build()
+        }
+            .also {
+            podcastServiceHandler.setMediaItemList(it)
+        }
+    }
+
+    private fun calculateProgressValue(currentProgress: Long) {
+        progress =
+            if (currentProgress > 0) ((currentProgress.toFloat() / duration.toFloat()) * 100f)
+            else 0f
+        progressString = formatDuration(currentProgress)
+    }
+
+    fun onUiEvents(uiEvents: UIEvents) = viewModelScope.launch {
+        when (uiEvents) {
+            UIEvents.Backward -> podcastServiceHandler.onPlayerEvents(PlayerEvent.Backward)
+            UIEvents.Forward -> podcastServiceHandler.onPlayerEvents(PlayerEvent.Forward)
+            UIEvents.SeekToNext -> podcastServiceHandler.onPlayerEvents(PlayerEvent.SeekToNext)
+            is UIEvents.PlayPause -> {
+                podcastServiceHandler.onPlayerEvents(
+                    PlayerEvent.PlayPause
+                )
+            }
+
+            is UIEvents.SeekTo -> {
+                podcastServiceHandler.onPlayerEvents(
+                    PlayerEvent.SeekTo,
+                    seekPosition = ((duration * uiEvents.position) / 100f).toLong()
+                )
+            }
+
+            is UIEvents.SelectedAudioChange -> {
+                Log.d(TAG, "onUiEvents: SelectedAudioChange 1")
+                podcastServiceHandler.onPlayerEvents(
+                    PlayerEvent.SelectedAudioChange,
+                    selectedAudioIndex = uiEvents.index
+                )
+            }
+
+            is UIEvents.UpdateProgress -> {
+                podcastServiceHandler.onPlayerEvents(
+                    PlayerEvent.UpdateProgress(
+                        uiEvents.newProgress
+                    )
+                )
+                progress = uiEvents.newProgress
+            }
+        }
+    }
+
+    fun formatDuration(duration: Long): String {
+        val minute = TimeUnit.MINUTES.convert(duration, TimeUnit.MILLISECONDS)
+        val seconds = (minute) - minute * TimeUnit.SECONDS.convert(1, TimeUnit.MINUTES)
+        return String.format("%02d:%02d", minute, seconds)
+    }
+
+    override fun onCleared() {
+        viewModelScope.launch {
+            podcastServiceHandler.onPlayerEvents(PlayerEvent.Stop)
+        }
+        super.onCleared()
+    }
+
+
+}
+
+
+sealed class UIEvents{
+    object PlayPause : UIEvents()
+    data class SelectedAudioChange(val index: Int) : UIEvents()
+    data class SeekTo(val position: Float) : UIEvents()
+    object SeekToNext : UIEvents()
+    object Backward : UIEvents()
+    object Forward : UIEvents()
+    data class UpdateProgress(val newProgress: Float) : UIEvents()
+}
+
+sealed class UIState{
+    object Initial : UIState()
+    object Ready : UIState()
 }
