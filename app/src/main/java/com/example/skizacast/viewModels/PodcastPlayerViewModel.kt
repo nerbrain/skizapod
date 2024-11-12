@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.SavedStateHandleSaveableApi
 import androidx.lifecycle.viewmodel.compose.saveable
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
@@ -42,6 +43,8 @@ class PodcastPlayerViewModel @Inject constructor(
     var progress by savedStateHandle.saveable{ mutableStateOf(0f) }
     var progressString by savedStateHandle.saveable{ mutableStateOf("00:00") }
     var isPlaying by savedStateHandle.saveable{ mutableStateOf(false) }
+    @OptIn(SavedStateHandleSaveableApi::class)
+    var isActive by savedStateHandle.saveable{ mutableStateOf(false) }
     var currentSelectedAudio by savedStateHandle.saveable{ mutableStateOf(podcastDummy) }
     var audioList by savedStateHandle.saveable { mutableStateOf(listOf<Episode>()) }
 
@@ -61,6 +64,7 @@ class PodcastPlayerViewModel @Inject constructor(
                     PodcastAudioState.Initial -> _uiState.value = UIState.Initial
                     is PodcastAudioState.Buffering -> calculateProgressValue(mediaState.progress)
                     is PodcastAudioState.Playing -> isPlaying = mediaState.isPlaying
+                    is PodcastAudioState.Active -> isActive = mediaState.isActive
                     is PodcastAudioState.Progress -> calculateProgressValue(mediaState.progress)
                     is PodcastAudioState.CurrentPlaying -> {
 //                        currentSelectedAudio = audioList[mediaState.mediaItemIndex]
@@ -174,6 +178,8 @@ class PodcastPlayerViewModel @Inject constructor(
         }
         super.onCleared()
     }
+
+    companion object
 
 
 }

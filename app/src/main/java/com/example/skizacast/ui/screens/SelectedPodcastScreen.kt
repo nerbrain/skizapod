@@ -124,8 +124,8 @@ fun EpisodeCard(
 
         Text(text = episodeTitle, modifier = Modifier.fillMaxWidth(0.5f))
         Spacer(modifier = Modifier.padding(5.dp))
-        Text(text = episodeDuration, modifier = Modifier.fillMaxWidth(0.3f), color = Color.DarkGray)
-        Button(onClick = onItemClick, modifier = Modifier.fillMaxWidth(0.8f)) {
+//        Text(text = episodeDuration, modifier = Modifier.fillMaxWidth(0.3f), color = Color.DarkGray)
+        Button(onClick = onItemClick, modifier = Modifier.width(80.dp)) {
             Image(
                 painter = painterResource(R.drawable.baseline_play_circle_outline_24),
                 contentDescription = "Play Button",

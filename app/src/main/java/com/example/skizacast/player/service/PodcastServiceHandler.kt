@@ -63,6 +63,9 @@ class PodcastServiceHandler @Inject constructor(
                         _audioState.value = PodcastAudioState.Playing(
                             isPlaying = true
                         )
+                        _audioState.value = PodcastAudioState.Active(
+                            isActive = true
+                        )
                         exoPlayer.playWhenReady = true
                         startProgressUpdate()
                     }
@@ -147,6 +150,7 @@ sealed class PodcastAudioState{
     data class Progress(val progress: Long): PodcastAudioState()
     data class Buffering(val progress: Long): PodcastAudioState()
     data class Playing(val isPlaying: Boolean): PodcastAudioState()
+    data class Active(val isActive: Boolean): PodcastAudioState()
     data class CurrentPlaying(val mediaItemIndex: Int): PodcastAudioState()
 
 }
