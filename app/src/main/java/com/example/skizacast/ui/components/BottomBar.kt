@@ -37,6 +37,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.example.skizacast.data.model.Episode
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -47,6 +48,7 @@ fun BottomBar(
     isAudioPlaying: Boolean,
     onStart: () -> Unit,
     onNext: () -> Unit,
+    navController: NavController
 ){
 
     BottomAppBar(
@@ -62,7 +64,8 @@ fun BottomBar(
                     verticalAlignment = Alignment.CenterVertically
                 ){
                     PodcastInfo(
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f),
+                        navController = navController
                     )
 
                     MediaPlayerController(
@@ -114,6 +117,7 @@ fun MediaPlayerController(
 @Composable
 fun PodcastInfo(
     modifier: Modifier = Modifier,
+    navController: NavController
 ){
     Row (
         modifier = Modifier.padding(4.dp),
@@ -126,7 +130,7 @@ fun PodcastInfo(
                 color = MaterialTheme.colorScheme.onSurface
             )
         ) {
-
+            navController.navigate("player_screen")
         }
         Spacer(modifier = Modifier.padding(4.dp))
     }

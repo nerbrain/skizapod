@@ -32,7 +32,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.media3.common.util.UnstableApi
+import androidx.navigation.NavController
 import androidx.navigation.NavHost
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -41,6 +43,7 @@ import com.example.skizacast.data.model.Episode
 import com.example.skizacast.player.service.PodcastService
 import com.example.skizacast.ui.components.BottomBar
 import com.example.skizacast.ui.screens.HomeScreen
+import com.example.skizacast.ui.screens.PlayingPodcastScreen
 import com.example.skizacast.ui.screens.SelectedPodcastScreen
 import com.example.skizacast.viewModels.PodcastPlayerViewModel
 import com.example.skizacast.viewModels.UIEvents
@@ -52,6 +55,7 @@ import com.example.skizacast.viewModels.UIEvents
 fun SkizaPodApp(podcastPlayerViewModel: PodcastPlayerViewModel = viewModel()){
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     val context = LocalContext.current
+    val navController = rememberNavController()
 
     Scaffold (
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -64,6 +68,7 @@ fun SkizaPodApp(podcastPlayerViewModel: PodcastPlayerViewModel = viewModel()){
                     isAudioPlaying = podcastPlayerViewModel.isPlaying,
                     onStart = { podcastPlayerViewModel.onUiEvents(UIEvents.PlayPause)},
                     onNext = {podcastPlayerViewModel.onUiEvents(UIEvents.SeekToNext)},
+                    navController = navController
                 )
             }
 
@@ -72,7 +77,7 @@ fun SkizaPodApp(podcastPlayerViewModel: PodcastPlayerViewModel = viewModel()){
         Surface (
             modifier = Modifier.fillMaxSize()
         ){
-            SkizaApp(contentPadding = it)
+            SkizaApp(contentPadding = it, navController = navController)
 //            if(showBottomSheet){
 //                BottomSheetScaffold(
 //                    sheetPeekHeight = 128.dp,
@@ -118,11 +123,11 @@ fun SkizaPodTopAppBar(scrollBehavior: TopAppBarScrollBehavior, modifier: Modifie
 }
 
 @Composable
-fun SkizaApp(podcastPlayerViewModel: PodcastPlayerViewModel = viewModel(), contentPadding: PaddingValues){
-    val navController = rememberNavController()
+fun SkizaApp(podcastPlayerViewModel: PodcastPlayerViewModel = viewModel(), contentPadding: PaddingValues,
+             navController: NavController ){
     val context = LocalContext.current
     NavHost(
-        navController,
+        navController as NavHostController,
         startDestination = "pod"
     ){
         composable(route = "pod") {
@@ -136,6 +141,11 @@ fun SkizaApp(podcastPlayerViewModel: PodcastPlayerViewModel = viewModel(), conte
                 onItemClick = {
                 play(it, context, podcastPlayerViewModel)
             })
+        }
+        composable(route="player_screen"){
+            PlayingPodcastScreen(podcastPlayerViewModel)
+
+            //TODO Make it look better
         }
     }
 }
